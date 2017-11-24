@@ -29,5 +29,5 @@
   "devDependencies": {
     "mocha": "^4.0.1"
   },
-  "repository": ""
+  "repository": "https://github.com/nellysattari/log-winston-aws-lambda-level"
 }
