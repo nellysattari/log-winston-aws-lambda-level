@@ -90,12 +90,18 @@ winstonLogger.updateLevel = (level) => {
 }
 
 winstonLogger.errTransformer = (err) => {
+    if (err) {
     const error = {
         Body: (err.body) ? err.body.message : err.message,
         StackError: (err.stack) ? err.stack : '',
         Status: (err.statusCode) ? err.statusCode : '',
     }
     return JSON.stringify(error);
+    }
+    else{
+        return err;
+    }
+
 };
 
 module.exports = winstonLogger;

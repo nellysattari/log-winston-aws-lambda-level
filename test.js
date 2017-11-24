@@ -79,6 +79,16 @@ describe('Logger', function(){
 
         });
 
+ it('should format error object return json with Body property', function(){
+           var errorObject= Error("Body of error","Error message",500);
+           var err=logger.errTransformer(errorObject);
+           assert.ok(err.length >0 && (errorObject),"error object ransformed properly");
+           assert.ok(JSON.parse(err).Body,"error fomated properly");
+        });
+
+        
+        
+
         
 
     })
