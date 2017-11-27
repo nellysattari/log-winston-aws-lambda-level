@@ -21,7 +21,6 @@
   "author": "Nelly Sattari",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.17.1",
     "chai": "^4.1.2",
     "moment": "^2.19.2",
     "winston": "^2.4.0"

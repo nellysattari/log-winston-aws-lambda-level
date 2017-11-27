@@ -1,7 +1,6 @@
 'use strict';
 
 const logger = require('../index');
-const axios=require('axios');
 const handleError = (err, callback, loggParams) => {
   const body = { errorMessage: err.message } || err.body;
   logger.error(logger.errTransformer(err, loggParams.CorrelationId));
