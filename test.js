@@ -64,7 +64,7 @@ describe('Logger', function(){
 
         });
 
- it.skip('should log endPoint and return executionTime', function(){
+ it('should log endPoint and return Duration Second', function(){
             let Mockresult={ 
                  body : "Response" ,
             }
@@ -72,18 +72,30 @@ describe('Logger', function(){
             let MockloggParams={
                CorrelationId:"1111",
                Starthr: process.hrtime(),
-               Start: new Date().getTime() 
             }
 
-              logger.endPoint(Mockresult, MockloggParams);
+              var params= logger.endPoint(Mockresult, MockloggParams);
+              assert.ok(params.Duration,"include Duration time");
+
 
         });
 
+ 
  it('should format error object return json with Body property', function(){
            var errorObject= Error("Body of error","Error message",500);
            var err=logger.errTransformer(errorObject);
+           console.log(JSON.parse(err));
            assert.ok(err.length >0 && (errorObject),"error object ransformed properly");
            assert.ok(JSON.parse(err).Body,"error fomated properly");
+        });
+
+        
+        it('should format error object return json with Correlation property', function(){
+           var errorObject= Error("Body of error","Error message",500);
+           var correlationId='111';
+           var err=logger.errTransformer(errorObject,correlationId);
+           assert.ok(err.length >0 && (errorObject),"error object ransformed properly");
+           assert.ok(JSON.parse(err).CorrelationId,correlationId);
         });
 
         

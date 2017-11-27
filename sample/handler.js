@@ -4,7 +4,7 @@ const logger = require('../index');
 const axios=require('axios');
 const handleError = (err, callback, loggParams) => {
   const body = { errorMessage: err.message } || err.body;
-  logger.error(logger.errTransformer(err), loggParams.CorrelationId);
+  logger.error(logger.errTransformer(err, loggParams.CorrelationId));
 
   callback(null, {
     statusCode: err.statusCode,
@@ -36,7 +36,11 @@ module.exports.Validation = (event, context, callback) => {
   let loggParams = setupLogger(event, context);
   let query = (event.body || event);
   query.CorrelationId = loggParams.CorrelationId;
-  axios.get("www.google.com")
+  //You can run the function either with failour or sucess message in order to mock your lambda function
+  Promise.resolve("Successfull Message")
+  // Promise.reject(Error("Body of error","Error message",500))
   .then(result => handleSuccess(result, callback, loggParams))
   .catch(err => handleError(err, callback, loggParams));
 };
+ 
+ 

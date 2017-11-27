@@ -6,38 +6,44 @@ const moment = require('moment');
 let logLevel = 'info';
 
 const entryPoint = (event, context) => {
-    let params = {
-        CorrelationId: (context) ? context.awsRequestId : "",
-        Http: (event.method) ? event.method.toUpperCase() : "",
-        FunctionName: (context) ? context.functionName : "",
-        Path: (event.path) ? event.path : "",
-        Request: (event.body) ? event.body : "",
-        Headers: (event.headers) ? event.headers : "",
-    };
 
-    winstonLogger.info(params);
-    const briefedParams = { CorrelationId: params.CorrelationId, Starthr: process.hrtime(), Start: new Date().getTime() };
-    return briefedParams;
+  let params = {
+    CorrelationId: (context) ? context.awsRequestId : "111",
+    Http: (event.method) ? event.method.toUpperCase() : "",
+    FunctionName: (context) ? context.functionName : "",
+    Path: (event.path) ? event.path : "",
+    Request: (event.body) ? event.body : "",
+    Headers: (event.headers) ? event.headers : "",
+  };
+  const briefedParams = { CorrelationId: params.CorrelationId, Starthr: process.hrtime() };
+  winstonLogger.info(params);
+  return briefedParams;
 }
+
+
 
 const endPoint = (response, loggParams) => {
-    var end = new Date().getTime() - loggParams.Start;
-    var executionTimehr = process.hrtime(loggParams.HrStart);
-    let params = {
-        CorrelationId: loggParams.CorrelationId,
-        ExecutionTimehr: `${executionTimehr[0]} sec`,
-        ExecutionTime: `${end} ms`,
-    };
-    if (response.Errors) {
-        params.StatusCode = 500;
-        params.Body = response.Errors;
-    }
-    else {
-        params.StatusCode = 200;
-        params.Body = response;
-    }
-    winstonLogger.info(params);
+  var executionTimehr = process.hrtime(loggParams.Starthr);
+  const nanoseconds = (executionTimehr[0] * 1e9) + executionTimehr[1];
+  const milliseconds = nanoseconds / 1e6;
+  const seconds = nanoseconds / 1e9;
+
+  let params = {
+    CorrelationId: loggParams.CorrelationId,
+    Duration: `${seconds} sec `,
+  };
+  if (response.Errors) {
+    params.StatusCode = 500;
+    params.Body = response.Errors;
+  }
+  else {
+    params.StatusCode = 200;
+    params.Body = response;
+  }
+  winstonLogger.info(params);
+  return params;
 }
+
 
 
 const updateLevel = (level) => {
@@ -89,19 +95,20 @@ winstonLogger.updateLevel = (level) => {
         return updateLevel(level);
 }
 
-winstonLogger.errTransformer = (err) => {
-    if (err) {
+winstonLogger.errTransformer = (err, CorrelationId) => {
+  if (err) {
     const error = {
-        Body: (err.body) ? err.body.message : err.message,
-        StackError: (err.stack) ? err.stack : '',
-        Status: (err.statusCode) ? err.statusCode : '',
+      Body: (err.body) ? err.body.message : err.message,
+      StackError: (err.stack) ? err.stack : '',
+      Status: (err.statusCode) ? err.statusCode : '',
+      CorrelationId: (CorrelationId) ? CorrelationId : '',
     }
     return JSON.stringify(error);
-    }
-    else{
-        return err;
-    }
-
+  }
+  else {
+    return err;
+  }
 };
+
 
 module.exports = winstonLogger;
