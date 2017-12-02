@@ -38,7 +38,7 @@ const endPoint = (response, loggParams) => {
   }
   else {
     params.StatusCode = 200;
-    params.Body = response;
+    params.Body = (response)?response:'undefined';
   }
   winstonLogger.info(params);
   return params;

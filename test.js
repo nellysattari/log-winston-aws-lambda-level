@@ -91,7 +91,7 @@ describe('Logger', function () {
             }
 
             var params = logger.endPoint(undefined, MockloggParams);
-            assert.equal(params.Body, undefined);
+            assert.equal(params.Body, 'undefined');
 
         });
 
