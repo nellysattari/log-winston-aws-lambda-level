@@ -32,7 +32,7 @@ const endPoint = (response, loggParams) => {
     CorrelationId: loggParams.CorrelationId,
     Duration: `${seconds} sec `,
   };
-  if (response.Errors) {
+  if (response && response.Errors) {
     params.StatusCode = 500;
     params.Body = response.Errors;
   }
