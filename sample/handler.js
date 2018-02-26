@@ -4,7 +4,7 @@ const logger = require('../index');
 const handleError = (err, callback, loggParams) => {
   const body = { errorMessage: err.message } || err.body;
   logger.error(logger.errTransformer(err, loggParams.CorrelationId));
-
+   
   callback(null, {
     statusCode: err.statusCode,
     body: JSON.stringify(body),
@@ -31,15 +31,21 @@ const setupLogger = (event, context) => {
   return logger.entryPoint(event, context);
 }
 
-module.exports.Validation = (event, context, callback) => {
+module.exports.ValidationSucees = (event, context, callback) => {
   let loggParams = setupLogger(event, context);
   let query = (event.body || event);
   query.CorrelationId = loggParams.CorrelationId;
-  //You can run the function either with failour or sucess message in order to mock your lambda function
   Promise.resolve("Successfull Message")
-  // Promise.reject(Error("Body of error","Error message",500))
   .then(result => handleSuccess(result, callback, loggParams))
   .catch(err => handleError(err, callback, loggParams));
 };
  
  
+module.exports.ValidationFail = (event, context, callback) => {
+  let loggParams = setupLogger(event, context);
+  let query = (event.body || event);
+  query.CorrelationId = loggParams.CorrelationId;
+  Promise.reject(new Error("Body of error","Error message",500))
+  .then(result => handleSuccess(result, callback, loggParams))
+  .catch(err => handleError(err, callback, loggParams));
+};

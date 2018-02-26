@@ -60,6 +60,7 @@ catch(err){
 ```
 what would you get back is:
 const error = {
+        Error: (err)?err:'',
         Body: (err.body) ? err.body.message : err.message,
         StackError: (err.stack) ? err.stack : '',
         Status: (err.statusCode) ? err.statusCode : '',

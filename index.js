@@ -14,6 +14,7 @@ const entryPoint = (event, context) => {
     Path: (event.path) ? event.path : "",
     Request: (event.body) ? event.body : "",
     Headers: (event.headers) ? event.headers : "",
+    PathParameters: (event.pathParameters) ? event.pathParameters : "",
   };
   const briefedParams = { CorrelationId: params.CorrelationId, Starthr: process.hrtime() };
   winstonLogger.info(params);
@@ -38,7 +39,7 @@ const endPoint = (response, loggParams) => {
   }
   else {
     params.StatusCode = 200;
-    params.Body = (response)?response:'undefined';
+    params.Body = (response) ? response : 'undefined';
   }
   winstonLogger.info(params);
   return params;
@@ -47,68 +48,88 @@ const endPoint = (response, loggParams) => {
 
 
 const updateLevel = (level) => {
-    winstonLogger.transports.console.level = level.toLowerCase();
+  winstonLogger.transports.console.level = level.toLowerCase();
 }
 
 
-const currentLevel = function(){
-   return winstonLogger.transports.console.level;
+const currentLevel = function () {
+  return winstonLogger.transports.console.level;
 }
 
 const formatter = options => {
-    const timestamp = options.timestamp();
-    let level = options.level.toUpperCase();
+  const timestamp = options.timestamp();
+  let level = options.level.toUpperCase();
 
-    const message = options.message || '';
-    const metaPresent = options.meta && Object.keys(options.meta).length;
-    const meta = metaPresent ? `\n\t${JSON.stringify(options.meta)}` : '';
-    return `${timestamp} ${level} ${message} ${meta} `;
+  const message = options.message || '';
+  const metaPresent = options.meta && Object.keys(options.meta).length;
+  const meta = metaPresent ? `\n\t${JSON.stringify(options.meta)}` : '';
+  return `${timestamp} ${level} ${message} ${meta} `;
 
 };
 
 const transportConsole = new (winston.transports.Console)({
-    level: logLevel,
-    timestamp: () => `[${moment().toISOString()}]`,
-    name: 'console',
-    formatter,
+  level: logLevel,
+  timestamp: () => `[${moment().toISOString()}]`,
+  name: 'console',
+  formatter,
 });
 
 const winstonLogger = new (winston.Logger)({
-    transports: [transportConsole],
+  transports: [transportConsole],
 });
 
-winstonLogger.currentLevel=()=>{
-    return currentLevel();
+winstonLogger.currentLevel = () => {
+  return currentLevel();
 }
 
 winstonLogger.entryPoint = (event, loggParams) => {
-    return entryPoint(event, loggParams);
+  return entryPoint(event, loggParams);
 };
 
 winstonLogger.endPoint = (response, loggParams) => {
-    return endPoint(response, loggParams);
+  return endPoint(response, loggParams);
 };
 
 
 winstonLogger.updateLevel = (level) => {
-    if (level)
-        return updateLevel(level);
+  if (level)
+    return updateLevel(level);
+}
+
+
+winstonLogger.flattenObject = (objectToInspect) => {
+  var result = [];
+  delete Object.getPrototypeOf(objectToInspect).constructor;
+  delete Object.getPrototypeOf(objectToInspect).toString;
+  var numberOfFields = Object.getOwnPropertyNames(objectToInspect).length;
+
+  for (var i = 0; i < numberOfFields; i++) {
+    var propName = Object.getOwnPropertyNames(objectToInspect)[i];
+    result.push(objectToInspect[propName]);
+  }
+
+  return result;
 }
 
 winstonLogger.errTransformer = (err, CorrelationId) => {
   if (err) {
-    const error = {
-      Body: (err.body) ? err.body.message : err.message,
-      StackError: (err.stack) ? err.stack : '',
-      Status: (err.statusCode) ? err.statusCode : '',
-      CorrelationId: (CorrelationId) ? CorrelationId : '',
+    err.CorrelationId = CorrelationId;
+    try {
+      const error = winstonLogger.flattenObjsect(err);
+      return JSON.stringify(error);
+    } catch (errorLogger) {
+      const error = {
+        Body: (err) ? err : {},
+        StackError: (err.stack) ? err.stack : '',
+        Status: (err.statusCode) ? err.statusCode : '',
+        CorrelationId: (CorrelationId) ? CorrelationId : '',
+      }
+      return JSON.stringify(error);
     }
-    return JSON.stringify(error);
   }
   else {
     return err;
   }
 };
-
 
 module.exports = winstonLogger;

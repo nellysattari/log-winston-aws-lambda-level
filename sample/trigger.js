@@ -1,7 +1,7 @@
 'use strict';
 
 const handler = require('./handler');
-const Mockevent={
+const Mockevent = {
     "resource": "/",
     "path": "/",
     "httpMethod": "POST",
@@ -11,10 +11,12 @@ const Mockevent={
     }
 };
 
-const Mockcontext={
+const Mockcontext = {
     "awsRequestId": "Abc123",
-     "functionName": "Validation-function",
+    "functionName": "Validation-function",
 };
 
- 
-handler.Validation(Mockevent,Mockcontext,(error, result) => { console.log('End Function')});
+//You can run the function either with failour or sucess message in order to mock your lambda function
+// handler.ValidationSucees(Mockevent,Mockcontext,(error, result) => { console.log('End Function')});
+handler.ValidationFail(Mockevent,Mockcontext,(error, result) => { console.log('End Function')});
+  
