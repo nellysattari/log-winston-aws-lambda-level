@@ -1,6 +1,6 @@
 {
   "name": "log-winston-aws-level",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "A logger for aws lambda functions on the top of winston library supporting correlationId , log level at run time, json formatted messages, and execution time for lambda",
   "main": "index.js",
   "scripts": {
