@@ -105,7 +105,7 @@ describe('Logger', function () {
 
 
         it('should format error object return json with Correlation property', function () {
-          var errorObject = Error("Body of error", "Error message", 500);
+          var errorObject = Error( "Body of error", "Error message", 500);
             var correlationId = '111';
             var err = logger.errTransformer(errorObject, correlationId);
 

@@ -105,35 +105,45 @@ winstonLogger.flattenObject = (objectToInspect) => {
 
   for (var i = 0; i < numberOfFields; i++) {
     var propName = Object.getOwnPropertyNames(objectToInspect)[i];
-    result[propName]= objectToInspect[propName];
+    result[propName] = objectToInspect[propName];
   }
-  
+
   return result;
 }
+
+
+winstonLogger.convertToJson = (referenceError) => {
+  var cache = [];
+  return JSON.stringify(referenceError, function (key, value) {
+    if (typeof value === 'object' && value !== null) {
+      if (cache.indexOf(value) !== -1) {
+        // Circular reference found, discard key
+        return;
+      }
+      // Store value in our collection
+      cache.push(value);
+    }
+
+    return value;
+  });
+  cache = null;
+}
+
 
 winstonLogger.errTransformer = (err, CorrelationId) => {
   if (err) {
     try {
-       var error = winstonLogger.flattenObject(err);
-       error.CorrelationId = CorrelationId;
-      // return JSON.stringify(error);
-      var cache = [];
       var error = winstonLogger.flattenObject(err);
       error.CorrelationId = CorrelationId;
-      return JSON.stringify(error, function (key, value) {
-        if (typeof value === 'object' && value !== null) {
-          if (cache.indexOf(value) !== -1) {
-            // Circular reference found, discard key
-            return;
-          }
-          // Store value in our collection
-          cache.push(value);
-        }
-        
-        return value;
-      });
-      cache = null;
-    } 
+      var error = winstonLogger.flattenObject(err);
+      error.CorrelationId = CorrelationId;
+      if (error.body && error.body.body && error.body.body.response) {
+        var response = error.body.body.response;
+        error.Error = response;
+        delete error.body;
+      }
+      return winstonLogger.convertToJson(error);
+    }
     catch (errorLogger) {
       const error = {
         Body: (err) ? err : {},
