@@ -58,14 +58,8 @@ catch(err){
     let error = logger.errTransformer(err,CorrelationId);
 }
 ```
-what would you get back is:
-const error = {
-        Error: (err)?err:'',
-        Body: (err.body) ? err.body.message : err.message,
-        StackError: (err.stack) ? err.stack : '',
-        Status: (err.statusCode) ? err.statusCode : '',
-        CorrelationId: (CorrelationId) ? CorrelationId : '',
-    }
+This method also supports complex objects and resolves the issue of `typeerror converting circular structure to json`.
+
 and then the object would be transformed to a json.
 
 ### How to set the log level at runtime:
