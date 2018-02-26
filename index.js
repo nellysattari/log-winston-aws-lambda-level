@@ -116,7 +116,23 @@ winstonLogger.errTransformer = (err, CorrelationId) => {
     try {
        var error = winstonLogger.flattenObject(err);
        error.CorrelationId = CorrelationId;
-      return JSON.stringify(error);
+      // return JSON.stringify(error);
+      var cache = [];
+      var error = winstonLogger.flattenObject(err);
+      error.CorrelationId = CorrelationId;
+      return JSON.stringify(error, function (key, value) {
+        if (typeof value === 'object' && value !== null) {
+          if (cache.indexOf(value) !== -1) {
+            // Circular reference found, discard key
+            return;
+          }
+          // Store value in our collection
+          cache.push(value);
+        }
+        
+        return value;
+      });
+      cache = null;
     } 
     catch (errorLogger) {
       const error = {
