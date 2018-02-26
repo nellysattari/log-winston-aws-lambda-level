@@ -100,7 +100,7 @@ describe('Logger', function () {
             var errorObject = Error("Body of error", "Error message", 500);
             var err = logger.errTransformer(errorObject);
             assert.ok(err.length > 0 && (errorObject), "error object transformed properly");
-            assert.ok(JSON.parse(err).Body, "error fomated properly");
+            assert.ok(JSON.parse(err).message, "error fomated properly");
         });
 
 

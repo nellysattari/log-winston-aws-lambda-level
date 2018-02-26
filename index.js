@@ -98,26 +98,27 @@ winstonLogger.updateLevel = (level) => {
 
 
 winstonLogger.flattenObject = (objectToInspect) => {
-  var result = [];
+  var result = {};
   delete Object.getPrototypeOf(objectToInspect).constructor;
   delete Object.getPrototypeOf(objectToInspect).toString;
   var numberOfFields = Object.getOwnPropertyNames(objectToInspect).length;
 
   for (var i = 0; i < numberOfFields; i++) {
     var propName = Object.getOwnPropertyNames(objectToInspect)[i];
-    result.push(objectToInspect[propName]);
+    result[propName]= objectToInspect[propName];
   }
-
+  
   return result;
 }
 
 winstonLogger.errTransformer = (err, CorrelationId) => {
   if (err) {
-    err.CorrelationId = CorrelationId;
     try {
-      const error = winstonLogger.flattenObjsect(err);
+       var error = winstonLogger.flattenObject(err);
+       error.CorrelationId = CorrelationId;
       return JSON.stringify(error);
-    } catch (errorLogger) {
+    } 
+    catch (errorLogger) {
       const error = {
         Body: (err) ? err : {},
         StackError: (err.stack) ? err.stack : '',
