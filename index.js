@@ -137,8 +137,8 @@ winstonLogger.errTransformer = (err, CorrelationId) => {
       error.CorrelationId = CorrelationId;
       var error = winstonLogger.flattenObject(err);
       error.CorrelationId = CorrelationId;
-      if (error.body && error.body.body && error.body.body.response) {
-        var response = error.body.body.response;
+      if (error.body && error.body.body && error.body.body.response && error.body.body.response.data) {
+        var response = error.body.body.response.data;
         error.Error = response;
         delete error.body;
       }
